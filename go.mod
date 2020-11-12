@@ -14,7 +14,6 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/syndtr/goleveldb v1.0.0
 	github.com/xormplus/builder v0.0.0-20200331055651-240ff40009be
-	github.com/wjames2000/xorm v0.0.0-20201020065950-782d727a761a
 	github.com/ziutek/mymysql v1.5.4
 	gopkg.in/flosch/pongo2.v3 v3.0.0-20141028000813-5e81b817a0c4
 )
