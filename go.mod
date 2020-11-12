@@ -1,4 +1,4 @@
-module xorm_kingbase
+module xorm
 
 go 1.14
 
