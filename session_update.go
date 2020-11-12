@@ -12,9 +12,9 @@ import (
 	"strings"
 
 	"github.com/xormplus/builder"
-	"github.com/xormplus/xorm/caches"
-	"github.com/xormplus/xorm/internal/utils"
-	"github.com/xormplus/xorm/schemas"
+	"github.com/wjames2000/xorm/caches"
+	"github.com/wjames2000/xorm/internal/utils"
+	"github.com/wjames2000/xorm/schemas"
 )
 
 func (session *Session) cacheUpdate(table *schemas.Table, tableName, sqlStr string, args ...interface{}) error {
@@ -357,7 +357,7 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 			if len(condSQL) > 0 {
 				condSQL = "WHERE " + condSQL
 			}
-		case schemas.POSTGRES:
+		case schemas.POSTGRES, schemas.KINGBASE:
 			tempCondSQL := condSQL + fmt.Sprintf(" LIMIT %d", limitValue)
 			cond = cond.And(builder.Expr(fmt.Sprintf("CTID IN (SELECT CTID FROM %v %v)",
 				session.engine.Quote(tableName), tempCondSQL), condArgs...))

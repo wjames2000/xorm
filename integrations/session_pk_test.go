@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/xormplus/xorm/schemas"
+	"github.com/wjames2000/xorm/schemas"
 )
 
 type IntId struct {

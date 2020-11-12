@@ -19,6 +19,7 @@ const (
 	MYSQL    DBType = "mysql"
 	MSSQL    DBType = "mssql"
 	ORACLE   DBType = "oracle"
+	KINGBASE   DBType = "kingbase"
 )
 
 // SQLType represents SQL types

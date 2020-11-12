@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/xormplus/xorm"
+	"github.com/wjames2000/xorm"
 
 	_ "github.com/lib/pq"
 )

@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/xormplus/xorm/core"
-	"github.com/xormplus/xorm/schemas"
+	"github.com/wjames2000/xorm/core"
+	"github.com/wjames2000/xorm/schemas"
 )
 
 var (

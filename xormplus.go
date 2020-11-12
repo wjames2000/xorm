@@ -11,6 +11,7 @@ const (
 	OCI8_DRIVER       string = "oci8"
 	GORACLE_DRIVER    string = "godror"
 	SQLITE3_DRIVER    string = "sqlite3"
+	KINGBASE    string = "kingbase"
 )
 
 func NewOracle(driverName string, dataSourceName string) (*Engine, error) {
@@ -35,4 +36,8 @@ func NewSqlite3(dataSourceName string) (*Engine, error) {
 
 func NewDB(driverName string, dataSourceName string) (*Engine, error) {
 	return NewEngine(driverName, dataSourceName)
+}
+
+func NewKB(driverName string, dataSourceName string) (*Engine, error) {
+	return NewEngine(KINGBASE, dataSourceName)
 }

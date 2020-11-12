@@ -1,8 +1,5 @@
-// Copyright 2015 The Xorm Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package dialects
+
 
 import (
 	"context"
@@ -16,9 +13,10 @@ import (
 	"github.com/wjames2000/xorm/schemas"
 )
 
+
 // from http://www.postgresql.org/docs/current/static/sql-keywords-appendix.html
 var (
-	postgresReservedWords = map[string]bool{
+	kingbasReservedWords = map[string]bool{
 		"A":                                true,
 		"ABORT":                            true,
 		"ABS":                              true,
@@ -767,7 +765,7 @@ var (
 		"ZONE":                             true,
 	}
 
-	postgresQuoter = schemas.Quoter{
+	kingbaseQuoter = schemas.Quoter{
 		Prefix:     '"',
 		Suffix:     '"',
 		IsReserved: schemas.AlwaysReserve,
@@ -776,26 +774,26 @@ var (
 
 var (
 	// DefaultPostgresSchema default postgres schema
-	DefaultPostgresSchema = "public"
+	DefaultKingbaseSchema = "public"
 )
 
-type postgres struct {
+type kingbase struct {
 	Base
 }
 
-func (db *postgres) Init(uri *URI) error {
-	db.quoter = postgresQuoter
+func (db *kingbase) Init(uri *URI) error {
+	db.quoter = kingbaseQuoter
 	return db.Base.Init(db, uri)
 }
 
-func (db *postgres) getSchema() string {
+func (db *kingbase) getSchema() string {
 	if db.uri.Schema != "" {
 		return db.uri.Schema
 	}
 	return DefaultPostgresSchema
 }
 
-func (db *postgres) needQuote(name string) bool {
+func (db *kingbase) needQuote(name string) bool {
 	if db.IsReserved(name) {
 		return true
 	}
@@ -807,24 +805,24 @@ func (db *postgres) needQuote(name string) bool {
 	return false
 }
 
-func (db *postgres) SetQuotePolicy(quotePolicy QuotePolicy) {
+func (db *kingbase) SetQuotePolicy(quotePolicy QuotePolicy) {
 	switch quotePolicy {
 	case QuotePolicyNone:
-		var q = postgresQuoter
+		var q = kingbaseQuoter
 		q.IsReserved = schemas.AlwaysNoReserve
 		db.quoter = q
 	case QuotePolicyReserved:
-		var q = postgresQuoter
+		var q = kingbaseQuoter
 		q.IsReserved = db.needQuote
 		db.quoter = q
 	case QuotePolicyAlways:
 		fallthrough
 	default:
-		db.quoter = postgresQuoter
+		db.quoter = kingbaseQuoter
 	}
 }
 
-func (db *postgres) SQLType(c *schemas.Column) string {
+func (db *kingbase) SQLType(c *schemas.Column) string {
 	var res string
 	switch t := c.SQLType.Name; t {
 	case schemas.TinyInt:
@@ -889,16 +887,16 @@ func (db *postgres) SQLType(c *schemas.Column) string {
 	return res
 }
 
-func (db *postgres) IsReserved(name string) bool {
+func (db *kingbase) IsReserved(name string) bool {
 	_, ok := postgresReservedWords[strings.ToUpper(name)]
 	return ok
 }
 
-func (db *postgres) AutoIncrStr() string {
+func (db *kingbase) AutoIncrStr() string {
 	return ""
 }
 
-func (db *postgres) CreateTableSQL(table *schemas.Table, tableName string) ([]string, bool) {
+func (db *kingbase) CreateTableSQL(table *schemas.Table, tableName string) ([]string, bool) {
 	var sql string
 	sql = "CREATE TABLE IF NOT EXISTS "
 	if tableName == "" {
@@ -933,18 +931,18 @@ func (db *postgres) CreateTableSQL(table *schemas.Table, tableName string) ([]st
 	return []string{sql}, true
 }
 
-func (db *postgres) IndexCheckSQL(tableName, idxName string) (string, []interface{}) {
+func (db *kingbase) IndexCheckSQL(tableName, idxName string) (string, []interface{}) {
 	if len(db.getSchema()) == 0 {
 		args := []interface{}{tableName, idxName}
-		return `SELECT indexname FROM pg_indexes WHERE tablename = ? AND indexname = ?`, args
+		return `SELECT indexname FROM sys_indexes WHERE tablename = ? AND indexname = ?`, args
 	}
 
 	args := []interface{}{db.getSchema(), tableName, idxName}
-	return `SELECT indexname FROM pg_indexes ` +
+	return `SELECT indexname FROM sys_indexes ` +
 		`WHERE schemaname = ? AND tablename = ? AND indexname = ?`, args
 }
 
-func (db *postgres) IsTableExist(queryer core.Queryer, ctx context.Context, tableName string) (bool, error) {
+func (db *kingbase) IsTableExist(queryer core.Queryer, ctx context.Context, tableName string) (bool, error) {
 	if len(db.getSchema()) == 0 {
 		return db.HasRecords(queryer, ctx, `SELECT tablename FROM pg_tables WHERE tablename = $1`, tableName)
 	}
@@ -953,7 +951,7 @@ func (db *postgres) IsTableExist(queryer core.Queryer, ctx context.Context, tabl
 		db.getSchema(), tableName)
 }
 
-func (db *postgres) ModifyColumnSQL(tableName string, col *schemas.Column) string {
+func (db *kingbase) ModifyColumnSQL(tableName string, col *schemas.Column) string {
 	if len(db.getSchema()) == 0 || strings.Contains(tableName, ".") {
 		return fmt.Sprintf("alter table %s ALTER COLUMN %s TYPE %s",
 			tableName, col.Name, db.SQLType(col))
@@ -962,7 +960,7 @@ func (db *postgres) ModifyColumnSQL(tableName string, col *schemas.Column) strin
 		db.getSchema(), tableName, col.Name, db.SQLType(col))
 }
 
-func (db *postgres) DropIndexSQL(tableName string, index *schemas.Index) string {
+func (db *kingbase) DropIndexSQL(tableName string, index *schemas.Index) string {
 	idxName := index.Name
 
 	tableParts := strings.Split(strings.Replace(tableName, `"`, "", -1), ".")
@@ -982,7 +980,7 @@ func (db *postgres) DropIndexSQL(tableName string, index *schemas.Index) string 
 	return fmt.Sprintf("DROP INDEX %v", db.Quoter().Quote(idxName))
 }
 
-func (db *postgres) IsColumnExist(queryer core.Queryer, ctx context.Context, tableName, colName string) (bool, error) {
+func (db *kingbase) IsColumnExist(queryer core.Queryer, ctx context.Context, tableName, colName string) (bool, error) {
 	args := []interface{}{db.getSchema(), tableName, colName}
 	query := "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema = $1 AND table_name = $2" +
 		" AND column_name = $3"
@@ -1001,17 +999,17 @@ func (db *postgres) IsColumnExist(queryer core.Queryer, ctx context.Context, tab
 	return rows.Next(), nil
 }
 
-func (db *postgres) GetColumns(queryer core.Queryer, ctx context.Context, tableName string) ([]string, map[string]*schemas.Column, error) {
+func (db *kingbase) GetColumns(queryer core.Queryer, ctx context.Context, tableName string) ([]string, map[string]*schemas.Column, error) {
 	args := []interface{}{tableName}
 	s := `SELECT column_name, column_default, is_nullable, data_type, character_maximum_length,
     CASE WHEN p.contype = 'p' THEN true ELSE false END AS primarykey,
     CASE WHEN p.contype = 'u' THEN true ELSE false END AS uniquekey
-FROM pg_attribute f
-    JOIN pg_class c ON c.oid = f.attrelid JOIN pg_type t ON t.oid = f.atttypid
-    LEFT JOIN pg_attrdef d ON d.adrelid = c.oid AND d.adnum = f.attnum
-    LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
-    LEFT JOIN pg_constraint p ON p.conrelid = c.oid AND f.attnum = ANY (p.conkey)
-    LEFT JOIN pg_class AS g ON p.confrelid = g.oid
+FROM sys_attribute f
+    JOIN sys_class c ON c.oid = f.attrelid JOIN sys_type t ON t.oid = f.atttypid
+    LEFT JOIN sys_attrdef d ON d.adrelid = c.oid AND d.adnum = f.attnum
+    LEFT JOIN sys_namespace n ON n.oid = c.relnamespace
+    LEFT JOIN sys_constraint p ON p.conrelid = c.oid AND f.attnum = ANY (p.conkey)
+    LEFT JOIN sys_class AS g ON p.confrelid = g.oid
     LEFT JOIN INFORMATION_SCHEMA.COLUMNS s ON s.column_name=f.attname AND c.relname=s.table_name
 WHERE n.nspname= s.table_schema AND c.relkind = 'r'::char AND c.relname = $1%s AND f.attnum > 0 ORDER BY f.attnum;`
 
@@ -1144,9 +1142,9 @@ WHERE n.nspname= s.table_schema AND c.relkind = 'r'::char AND c.relname = $1%s A
 	return colSeq, cols, nil
 }
 
-func (db *postgres) GetTables(queryer core.Queryer, ctx context.Context) ([]*schemas.Table, error) {
+func (db *kingbase) GetTables(queryer core.Queryer, ctx context.Context) ([]*schemas.Table, error) {
 	args := []interface{}{}
-	s := "SELECT tablename FROM pg_tables"
+	s := "SELECT tablename FROM sys_tables"
 	schema := db.getSchema()
 	if schema != "" {
 		args = append(args, schema)
@@ -1172,21 +1170,21 @@ func (db *postgres) GetTables(queryer core.Queryer, ctx context.Context) ([]*sch
 	}
 	return tables, nil
 }
+//
+//func getIndexColName(indexdef string) []string {
+//	var colNames []string
+//
+//	cs := strings.Split(indexdef, "(")
+//	for _, v := range strings.Split(strings.Split(cs[1], ")")[0], ",") {
+//		colNames = append(colNames, strings.Split(strings.TrimLeft(v, " "), " ")[0])
+//	}
+//
+//	return colNames
+//}
 
-func getIndexColName(indexdef string) []string {
-	var colNames []string
-
-	cs := strings.Split(indexdef, "(")
-	for _, v := range strings.Split(strings.Split(cs[1], ")")[0], ",") {
-		colNames = append(colNames, strings.Split(strings.TrimLeft(v, " "), " ")[0])
-	}
-
-	return colNames
-}
-
-func (db *postgres) GetIndexes(queryer core.Queryer, ctx context.Context, tableName string) (map[string]*schemas.Index, error) {
+func (db *kingbase) GetIndexes(queryer core.Queryer, ctx context.Context, tableName string) (map[string]*schemas.Index, error) {
 	args := []interface{}{tableName}
-	s := fmt.Sprintf("SELECT indexname, indexdef FROM pg_indexes WHERE tablename=$1")
+	s := fmt.Sprintf("SELECT indexname, indexdef FROM sys_indexes WHERE tablename=$1")
 	if len(db.getSchema()) != 0 {
 		args = append(args, db.getSchema())
 		s = s + " AND schemaname=$2"
@@ -1240,30 +1238,30 @@ func (db *postgres) GetIndexes(queryer core.Queryer, ctx context.Context, tableN
 	return indexes, nil
 }
 
-func (db *postgres) Filters() []Filter {
+func (db *kingbase) Filters() []Filter {
 	return []Filter{&SeqFilter{Prefix: "$", Start: 1}}
 }
 
-type pqDriver struct {
+type kdDriver struct {
 }
+//
+//type values map[string]string
+//
+//func (vs values) Set(k, v string) {
+//	vs[k] = v
+//}
+//
+//func (vs values) Get(k string) (v string) {
+//	return vs[k]
+//}
 
-type values map[string]string
-
-func (vs values) Set(k, v string) {
-	vs[k] = v
-}
-
-func (vs values) Get(k string) (v string) {
-	return vs[k]
-}
-
-func parseURL(connstr string) (string, error) {
+func parseKdURL(connstr string) (string, error) {
 	u, err := url.Parse(connstr)
 	if err != nil {
 		return "", err
 	}
 
-	if u.Scheme != "postgresql" && u.Scheme != "postgres" {
+	if u.Scheme != "kd" && u.Scheme != "kingbase" {
 		return "", fmt.Errorf("invalid connection protocol: %s", u.Scheme)
 	}
 
@@ -1275,32 +1273,32 @@ func parseURL(connstr string) (string, error) {
 
 	return "", nil
 }
+//
+//func parseKdOpts(name string, o values) error {
+//	if len(name) == 0 {
+//		return fmt.Errorf("invalid options: %s", name)
+//	}
+//
+//	name = strings.TrimSpace(name)
+//
+//	ps := strings.Split(name, " ")
+//	for _, p := range ps {
+//		kv := strings.Split(p, "=")
+//		if len(kv) < 2 {
+//			return fmt.Errorf("invalid option: %q", p)
+//		}
+//		o.Set(kv[0], kv[1])
+//	}
+//
+//	return nil
+//}
 
-func parseOpts(name string, o values) error {
-	if len(name) == 0 {
-		return fmt.Errorf("invalid options: %s", name)
-	}
-
-	name = strings.TrimSpace(name)
-
-	ps := strings.Split(name, " ")
-	for _, p := range ps {
-		kv := strings.Split(p, "=")
-		if len(kv) < 2 {
-			return fmt.Errorf("invalid option: %q", p)
-		}
-		o.Set(kv[0], kv[1])
-	}
-
-	return nil
-}
-
-func (p *pqDriver) Parse(driverName, dataSourceName string) (*URI, error) {
-	db := &URI{DBType: schemas.POSTGRES}
+func (p *kdDriver) Parse(driverName, dataSourceName string) (*URI, error) {
+	db := &URI{DBType: schemas.KINGBASE}
 	var err error
 
 	if strings.HasPrefix(dataSourceName, "postgresql://") || strings.HasPrefix(dataSourceName, "postgres://") {
-		db.DBName, err = parseURL(dataSourceName)
+		db.DBName, err = parseKdURL(dataSourceName)
 		if err != nil {
 			return nil, err
 		}
@@ -1321,20 +1319,20 @@ func (p *pqDriver) Parse(driverName, dataSourceName string) (*URI, error) {
 	return db, nil
 }
 
-type pqDriverPgx struct {
-	pqDriver
+type kdDriverPgx struct {
+	kdDriver
 }
 
-func (pgx *pqDriverPgx) Parse(driverName, dataSourceName string) (*URI, error) {
+func (kdx *kdDriverPgx) Parse(driverName, dataSourceName string) (*URI, error) {
 	// Remove the leading characters for driver to work
 	if len(dataSourceName) >= 9 && dataSourceName[0] == 0 {
 		dataSourceName = dataSourceName[9:]
 	}
-	return pgx.pqDriver.Parse(driverName, dataSourceName)
+	return kdx.kdDriver.Parse(driverName, dataSourceName)
 }
 
-// QueryDefaultPostgresSchema returns the default postgres schema
-func QueryDefaultPostgresSchema(ctx context.Context, queryer core.Queryer) (string, error) {
+// QueryDefaultKingbaseSchema returns the default kingbase schema
+func QueryDefaultKingbaseSchema(ctx context.Context, queryer core.Queryer) (string, error) {
 	rows, err := queryer.QueryContext(ctx, "SHOW SEARCH_PATH")
 	if err != nil {
 		return "", err
@@ -1351,3 +1349,4 @@ func QueryDefaultPostgresSchema(ctx context.Context, queryer core.Queryer) (stri
 
 	return "", errors.New("No default schema")
 }
+

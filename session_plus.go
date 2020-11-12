@@ -14,10 +14,10 @@ import (
 	"strings"
 
 	"github.com/Chronokeeper/anyxml"
-	"github.com/xormplus/xorm/core"
-	"github.com/xormplus/xorm/dialects"
-	"github.com/xormplus/xorm/internal/utils"
-	"github.com/xormplus/xorm/schemas"
+	"github.com/wjames2000/xorm/core"
+	"github.com/wjames2000/xorm/dialects"
+	"github.com/wjames2000/xorm/internal/utils"
+	"github.com/wjames2000/xorm/schemas"
 )
 
 type Record map[string]Value

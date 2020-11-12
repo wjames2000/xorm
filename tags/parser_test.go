@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/xormplus/xorm/caches"
-	"github.com/xormplus/xorm/dialects"
-	"github.com/xormplus/xorm/names"
+	"github.com/wjames2000/xorm/caches"
+	"github.com/wjames2000/xorm/dialects"
+	"github.com/wjames2000/xorm/names"
 )
 
 type ParseTableName1 struct{}

@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/xormplus/builder"
-	"github.com/xormplus/xorm/schemas"
+	"github.com/wjames2000/xorm/schemas"
 )
 
 func TestSetExpr(t *testing.T) {

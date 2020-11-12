@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/xormplus/builder"
-	"github.com/xormplus/xorm/schemas"
+	"github.com/wjames2000/xorm/schemas"
 )
 
 func (statement *Statement) writeInsertOutput(buf *strings.Builder, table *schemas.Table) error {
@@ -128,7 +128,7 @@ func (statement *Statement) GenInsertSQL(colNames []string, args []interface{}) 
 		}
 	}
 
-	if len(table.AutoIncrement) > 0 && statement.dialect.URI().DBType == schemas.POSTGRES {
+	if len(table.AutoIncrement) > 0 && (statement.dialect.URI().DBType == schemas.POSTGRES || statement.dialect.URI().DBType == schemas.KINGBASE) {
 		if _, err := buf.WriteString(" RETURNING "); err != nil {
 			return "", nil, err
 		}

@@ -14,11 +14,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/xormplus/xorm/convert"
-	"github.com/xormplus/xorm/dialects"
-	"github.com/xormplus/xorm/internal/json"
-	"github.com/xormplus/xorm/internal/utils"
-	"github.com/xormplus/xorm/schemas"
+	"github.com/wjames2000/xorm/convert"
+	"github.com/wjames2000/xorm/dialects"
+	"github.com/wjames2000/xorm/internal/json"
+	"github.com/wjames2000/xorm/internal/utils"
+	"github.com/wjames2000/xorm/schemas"
 )
 
 func (session *Session) str2Time(col *schemas.Column, data string) (outTime time.Time, outErr error) {

@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/xormplus/builder"
-	"github.com/xormplus/xorm/schemas"
+	"github.com/wjames2000/xorm/schemas"
 )
 
 func quoteNeeded(a interface{}) bool {

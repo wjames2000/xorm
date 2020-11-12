@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/xormplus/xorm/internal/utils"
-	"github.com/xormplus/xorm/schemas"
+	"github.com/wjames2000/xorm/internal/utils"
+	"github.com/wjames2000/xorm/schemas"
 )
 
 func (statement *Statement) ConvertIDSQL(sqlStr string) string {
@@ -54,9 +54,9 @@ func (statement *Statement) ConvertUpdateSQL(sqlStr string) (string, string) {
 
 	var whereStr = sqls[1]
 
-	// TODO: for postgres only, if any other database?
+	// TODO: for postgres/kingbase only, if any other database?
 	var paraStr string
-	if statement.dialect.URI().DBType == schemas.POSTGRES {
+	if statement.dialect.URI().DBType == schemas.POSTGRES || statement.dialect.URI().DBType == schemas.KINGBASE {
 		paraStr = "$"
 	} else if statement.dialect.URI().DBType == schemas.MSSQL {
 		paraStr = ":"
