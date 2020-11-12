@@ -380,7 +380,7 @@ func (session *Session) innerInsert(bean interface{}) (int64, error) {
 
 		return 1, nil
 	} else if len(table.AutoIncrement) > 0 && (session.engine.dialect.URI().DBType == schemas.POSTGRES ||
-		session.engine.dialect.URI().DBType == schemas.MSSQL) {
+		session.engine.dialect.URI().DBType == schemas.MSSQL || session.engine.dialect.URI().DBType == schemas.KINGBASE) {
 		res, err := session.queryBytes(sqlStr, args...)
 
 		if err != nil {

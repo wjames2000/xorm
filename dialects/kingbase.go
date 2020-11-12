@@ -790,7 +790,7 @@ func (db *kingbase) getSchema() string {
 	if db.uri.Schema != "" {
 		return db.uri.Schema
 	}
-	return DefaultPostgresSchema
+	return DefaultKingbaseSchema
 }
 
 func (db *kingbase) needQuote(name string) bool {
@@ -1297,7 +1297,7 @@ func (p *kdDriver) Parse(driverName, dataSourceName string) (*URI, error) {
 	db := &URI{DBType: schemas.KINGBASE}
 	var err error
 
-	if strings.HasPrefix(dataSourceName, "postgresql://") || strings.HasPrefix(dataSourceName, "postgres://") {
+	if strings.HasPrefix(dataSourceName, "kingbase://") {
 		db.DBName, err = parseKdURL(dataSourceName)
 		if err != nil {
 			return nil, err

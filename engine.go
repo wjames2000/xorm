@@ -542,7 +542,7 @@ func (engine *Engine) dumpTables(tables []*schemas.Table, w io.Writer, tp ...sch
 		}
 
 		// FIXME: Hack for postgres
-		if dstDialect.URI().DBType == schemas.POSTGRES && table.AutoIncrColumn() != nil {
+		if (dstDialect.URI().DBType == schemas.POSTGRES || dstDialect.URI().DBType == schemas.KINGBASE) && table.AutoIncrColumn() != nil {
 			_, err = io.WriteString(w, "SELECT setval('"+tableName+"_id_seq', COALESCE((SELECT MAX("+table.AutoIncrColumn().Name+") + 1 FROM "+dstDialect.Quoter().Quote(tableName)+"), 1), false);\n")
 			if err != nil {
 				return err

@@ -318,7 +318,7 @@ func (session *Session) Sync2(beans ...interface{}) error {
 					strings.HasPrefix(curType, schemas.Varchar) {
 					// currently only support mysql & postgres
 					if engine.dialect.URI().DBType == schemas.MYSQL ||
-						engine.dialect.URI().DBType == schemas.POSTGRES {
+						engine.dialect.URI().DBType == schemas.POSTGRES || engine.dialect.URI().DBType == schemas.KINGBASE {
 						engine.logger.Infof("Table %s column %s change type from %s to %s\n",
 							tbNameWithSchema, col.Name, curType, expectedType)
 						_, err = session.exec(engine.dialect.ModifyColumnSQL(tbNameWithSchema, col))
